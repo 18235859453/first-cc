@@ -32,10 +32,22 @@ COLORS = {
 }
 
 
-BTN_BG = "#ffffff"
-BTN_HOVER = "#e0e0e0"
-BTN_FG = "#333333"
+BTN_TOP = "#c084fc"
+BTN_BOT = "#7c3aed"
+BTN_HOVER_TOP = "#a855f7"
+BTN_HOVER_BOT = "#6d28d9"
+BTN_FG = "#ffffff"
 RADIUS = 10
+
+
+def _hex_to_rgb(h):
+    h = h.lstrip("#")
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
+
+def _interp(c1, c2, t):
+    return "#{:02x}{:02x}{:02x}".format(
+        *(int(a + (b - a) * t) for a, b in zip(c1, c2)))
 
 
 class RoundedButton(tk.Canvas):
@@ -46,7 +58,8 @@ class RoundedButton(tk.Canvas):
         self.btn_text = text
         self.btn_width = width
         self.btn_height = height
-        self._color = BTN_BG
+        self._top = BTN_TOP
+        self._bot = BTN_BOT
         self._draw()
         self.bind("<Button-1>", self._click)
         self.bind("<Enter>", lambda e: self._hover(True))
@@ -56,29 +69,27 @@ class RoundedButton(tk.Canvas):
         self.delete("all")
         r = RADIUS
         w, h = self.btn_width, self.btn_height
-        self.create_rounded_rect(2, 2, w - 2, h - 2, r, fill=self._color, outline="#cccccc")
+        x1, y1, x2, y2 = 2, 2, w - 2, h - 2
+        t1, t2 = _hex_to_rgb(self._top), _hex_to_rgb(self._bot)
+
+        for y in range(y1, y2 + 1):
+            t = (y - y1) / (y2 - y1) if y2 > y1 else 0
+            color = _interp(t1, t2, t)
+            if y < y1 + r:
+                dx = int(r - (r**2 - (y - (y1 + r))**2)**0.5) if r**2 - (y - (y1 + r))**2 >= 0 else r
+                self.create_line(x1 + r - dx, y, x2 - r + dx, y, fill=color)
+            elif y > y2 - r:
+                dx = int(r - (r**2 - (y - (y2 - r))**2)**0.5) if r**2 - (y - (y2 - r))**2 >= 0 else r
+                self.create_line(x1 + r - dx, y, x2 - r + dx, y, fill=color)
+            else:
+                self.create_line(x1, y, x2, y, fill=color)
+
         self.create_text(w / 2, h / 2, text=self.btn_text,
                          font=("Segoe UI", 10), fill=BTN_FG)
 
-    def create_rounded_rect(self, x1, y1, x2, y2, r, **kwargs):
-        self.create_arc(x1, y1, x1 + 2 * r, y1 + 2 * r, start=90, extent=90,
-                        style="pieslice", **kwargs)
-        self.create_arc(x2 - 2 * r, y1, x2, y1 + 2 * r, start=0, extent=90,
-                        style="pieslice", **kwargs)
-        self.create_arc(x1, y2 - 2 * r, x1 + 2 * r, y2, start=180, extent=90,
-                        style="pieslice", **kwargs)
-        self.create_arc(x2 - 2 * r, y2 - 2 * r, x2, y2, start=270, extent=90,
-                        style="pieslice", **kwargs)
-        self.create_rectangle(x1 + r, y1, x2 - r, y2, **kwargs)
-        self.create_rectangle(x1, y1 + r, x2, y2 - r, **kwargs)
-        if "outline" in kwargs:
-            self.create_line(x1 + r, y1, x2 - r, y1, fill=kwargs["outline"])
-            self.create_line(x1 + r, y2, x2 - r, y2, fill=kwargs["outline"])
-            self.create_line(x1, y1 + r, x1, y2 - r, fill=kwargs["outline"])
-            self.create_line(x2, y1 + r, x2, y2 - r, fill=kwargs["outline"])
-
     def _hover(self, enter):
-        self._color = BTN_HOVER if enter else BTN_BG
+        self._top = BTN_HOVER_TOP if enter else BTN_TOP
+        self._bot = BTN_HOVER_BOT if enter else BTN_BOT
         self._draw()
 
     def _click(self, event):
