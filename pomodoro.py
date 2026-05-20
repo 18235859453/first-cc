@@ -88,9 +88,10 @@ class PomodoroTimer:
         self._ring_bg = self.canvas.create_oval(20, 20, 200, 200,
                                                 outline="#e0e0e0", width=10)
         self._ring_fg = self.canvas.create_arc(20, 20, 200, 200,
-                                               start=90, extent=359.999,
+                                               start=90, extent=0,
                                                outline=COLORS["work"]["fg"],
-                                               width=10, style="arc")
+                                               width=10, style="arc",
+                                               state="hidden")
         self._timer_id = self.canvas.create_text(110, 100, text="25:00",
                                                  font=("Consolas", 38, "bold"),
                                                  fill=COLORS["work"]["fg"])
@@ -144,9 +145,13 @@ class PomodoroTimer:
         c = COLORS[self.session]
 
         self.canvas.itemconfig(self._timer_id, text=f"{mins:02d}:{secs:02d}", fill=c["fg"])
-        self.canvas.itemconfig(self._ring_fg, outline=c["fg"],
-                               extent=359.999 * ratio if ratio > 0 else 0.001,
-                               start=90 - (360 * ratio))
+        if ratio > 0:
+            self.canvas.itemconfig(self._ring_fg, outline=c["fg"],
+                                   extent=359.999 * ratio,
+                                   start=90 - (360 * ratio),
+                                   state="normal")
+        else:
+            self.canvas.itemconfig(self._ring_fg, state="hidden")
         self.canvas.itemconfig(self._status_id, text=c["label"])
         self.session_lbl.config(text=c["label"], foreground=c["fg"])
         self.progress["value"] = ratio * 100
