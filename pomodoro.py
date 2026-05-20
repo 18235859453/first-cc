@@ -75,11 +75,13 @@ class RoundedButton(tk.Canvas):
         for y in range(y1, y2 + 1):
             t = (y - y1) / (y2 - y1)
             color = _interp(t1, t2, t)
-            if y1 < y < y1 + r:
-                dx = int(r - (r**2 - (y - y1 - r)**2)**0.5)
+            if y < y1 + r:
+                dy = y - y1 - r
+                dx = int(r - (r**2 - dy**2)**0.5)
                 self.create_line(x1 + dx, y, x2 - dx, y, fill=color)
-            elif y2 - r < y < y2:
-                dx = int(r - (r**2 - (y - y2 + r)**2)**0.5)
+            elif y > y2 - r:
+                dy = y - y2 + r
+                dx = int(r - (r**2 - dy**2)**0.5)
                 self.create_line(x1 + dx, y, x2 - dx, y, fill=color)
             else:
                 self.create_line(x1, y, x2, y, fill=color)
