@@ -18,6 +18,7 @@ except ImportError:
     def _beep():
         print("\a")
 
+BG = "#e8f4fd"
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".pomodoro.json")
 WORK = 25 * 60
 SHORT_BREAK = 5 * 60
@@ -37,7 +38,7 @@ class PomodoroTimer:
         self.root.title("Pomodoro Timer")
         self.root.geometry("340x520")
         self.root.resizable(False, False)
-        self.root.configure(bg="#fafafa")
+        self.root.configure(bg=BG)
 
         style = ttk.Style()
         style.theme_use("clam")
@@ -71,17 +72,17 @@ class PomodoroTimer:
 
     # —— UI ——————————————————————————————————————————————————————
     def _build(self):
-        main = tk.Frame(self.root, bg="#fafafa")
+        main = tk.Frame(self.root, bg=BG)
         main.pack(fill=tk.BOTH, expand=True, padx=24, pady=20)
 
         ttk.Label(main, text="Pomodoro", font=("Segoe UI", 20, "bold"),
-                  background="#fafafa").pack(pady=(0, 2))
+                  background=BG).pack(pady=(0, 2))
 
-        self.session_lbl = ttk.Label(main, text="", font=("Segoe UI", 11), background="#fafafa")
+        self.session_lbl = ttk.Label(main, text="", font=("Segoe UI", 11), background=BG)
         self.session_lbl.pack()
 
         # canvas ring
-        self.canvas = tk.Canvas(main, width=220, height=220, bg="#fafafa",
+        self.canvas = tk.Canvas(main, width=220, height=220, bg=BG,
                                 highlightthickness=0)
         self.canvas.pack(pady=(16, 4))
         # background ring, segments ring, center text
@@ -104,7 +105,7 @@ class PomodoroTimer:
         self.progress.pack(pady=(0, 12))
 
         # buttons
-        row = tk.Frame(main, bg="#fafafa")
+        row = tk.Frame(main, bg=BG)
         row.pack()
         self.start_btn = ttk.Button(row, text="Start", command=self._toggle, width=8)
         self.start_btn.pack(side=tk.LEFT, padx=3)
@@ -112,21 +113,21 @@ class PomodoroTimer:
         ttk.Button(row, text="Skip", command=self._skip, width=8).pack(side=tk.LEFT, padx=3)
 
         # count + on-top
-        info = tk.Frame(main, bg="#fafafa")
+        info = tk.Frame(main, bg=BG)
         info.pack(pady=(14, 4))
         self.count_lbl = tk.Label(info, text="", font=("Segoe UI", 10),
-                                  bg="#fafafa", fg="#555555")
+                                  bg=BG, fg="#555555")
         self.count_lbl.pack(side=tk.LEFT)
 
         # presets
-        preset_frame = tk.Frame(main, bg="#fafafa")
+        preset_frame = tk.Frame(main, bg=BG)
         preset_frame.pack(pady=(6, 0))
         for label, mins in [("25 min", 25), ("15 min", 15), ("5 min", 5)]:
             ttk.Button(preset_frame, text=label, width=7,
                        command=lambda m=mins: self._set_work(m)).pack(side=tk.LEFT, padx=2)
 
         # settings gear
-        bottom = tk.Frame(main, bg="#fafafa")
+        bottom = tk.Frame(main, bg=BG)
         bottom.pack(fill=tk.X, pady=(8, 0))
         self.ontop_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(bottom, text="Pin on top", variable=self.ontop_var,
@@ -134,7 +135,7 @@ class PomodoroTimer:
                         ).pack(side=tk.LEFT)
 
         self.status_lbl = tk.Label(bottom, text="Ready", font=("Segoe UI", 9, "italic"),
-                                   bg="#fafafa", fg="#999999")
+                                   bg=BG, fg="#999999")
         self.status_lbl.pack(side=tk.RIGHT)
 
     # —— display —————————————————————————————————————————————————
