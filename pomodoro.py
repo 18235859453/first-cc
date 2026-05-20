@@ -42,7 +42,8 @@ class PomodoroTimer:
 
         style = ttk.Style()
         style.theme_use("clam")
-        style.configure("TButton", font=("Segoe UI", 10), padding=6)
+        style.configure("TButton", font=("Segoe UI", 10), padding=(16, 8),
+                        borderwidth=4, relief="raised")
         style.configure("TProgressbar", thickness=8)
 
         self.remaining = WORK
@@ -74,9 +75,6 @@ class PomodoroTimer:
     def _build(self):
         main = tk.Frame(self.root, bg=BG)
         main.pack(fill=tk.BOTH, expand=True, padx=24, pady=20)
-
-        ttk.Label(main, text="Pomodoro", font=("Segoe UI", 20, "bold"),
-                  background=BG).pack(pady=(0, 2))
 
         self.session_lbl = ttk.Label(main, text="", font=("Segoe UI", 11), background=BG)
         self.session_lbl.pack()
