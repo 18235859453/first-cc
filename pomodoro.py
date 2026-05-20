@@ -13,7 +13,7 @@ from datetime import date
 try:
     import winsound
     def _beep():
-        winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+        winsound.PlaySound("MailBeep", winsound.SND_ALIAS)
 except ImportError:
     def _beep():
         print("\a")
