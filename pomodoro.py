@@ -171,6 +171,8 @@ class PomodoroTimer:
         # progress bar
         self.progress = ttk.Progressbar(main, length=280, mode="determinate")
         self.progress.pack(pady=(0, 12))
+        self.progress.bind("<Button-1>", self._seek)
+        self.progress.bind("<B1-Motion>", self._seek)
 
         # buttons
         row = tk.Frame(main, bg=BG)
@@ -292,6 +294,12 @@ class PomodoroTimer:
         self.running = False
         self.remaining = 0
         self._done()
+
+    def _seek(self, event):
+        total = self._total()
+        ratio = max(0, min(1, event.x / self.progress.winfo_width()))
+        self.remaining = int(total * (1 - ratio))
+        self._update()
 
     def _set_work(self, mins):
         self.running = False
