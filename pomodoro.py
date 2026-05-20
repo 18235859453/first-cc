@@ -215,9 +215,10 @@ class PomodoroTimer:
         c = COLORS[self.session]
 
         self.canvas.itemconfig(self._timer_id, text=f"{mins:02d}:{secs:02d}", fill=c["fg"])
+        extent = max(0.001, 359.999 * ratio)
         self.canvas.itemconfig(self._ring_fg, outline=c["fg"],
-                               extent=359.999 * ratio,
-                               start=90 - (360 * ratio))
+                               start=90 - (360 * ratio),
+                               extent=extent)
         self.canvas.itemconfig(self._status_id, text=c["label"])
         self.session_lbl.config(text=c["label"], foreground=c["fg"])
         self.progress["value"] = ratio * 100
@@ -241,6 +242,7 @@ class PomodoroTimer:
                 "work": "Focusing…", "short_break": "Break…",
                 "long_break": "Long break…"
             }.get(self.session, ""))
+            self._update()
             threading.Thread(target=self._tick, daemon=True).start()
 
     def _tick(self):
