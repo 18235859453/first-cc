@@ -32,6 +32,65 @@ COLORS = {
 }
 
 
+BTN_BG = "#ffffff"
+BTN_HOVER = "#e0e0e0"
+BTN_FG = "#333333"
+RADIUS = 10
+
+
+class RoundedButton(tk.Canvas):
+    def __init__(self, parent, text="", command=None, width=100, height=36, **kwargs):
+        super().__init__(parent, width=width, height=height, bg=BG,
+                         highlightthickness=0, **kwargs)
+        self.command = command
+        self.btn_text = text
+        self.btn_width = width
+        self.btn_height = height
+        self._color = BTN_BG
+        self._draw()
+        self.bind("<Button-1>", self._click)
+        self.bind("<Enter>", lambda e: self._hover(True))
+        self.bind("<Leave>", lambda e: self._hover(False))
+
+    def _draw(self):
+        self.delete("all")
+        r = RADIUS
+        w, h = self.btn_width, self.btn_height
+        self.create_rounded_rect(2, 2, w - 2, h - 2, r, fill=self._color, outline="#cccccc")
+        self.create_text(w / 2, h / 2, text=self.btn_text,
+                         font=("Segoe UI", 10), fill=BTN_FG)
+
+    def create_rounded_rect(self, x1, y1, x2, y2, r, **kwargs):
+        self.create_arc(x1, y1, x1 + 2 * r, y1 + 2 * r, start=90, extent=90,
+                        style="pieslice", **kwargs)
+        self.create_arc(x2 - 2 * r, y1, x2, y1 + 2 * r, start=0, extent=90,
+                        style="pieslice", **kwargs)
+        self.create_arc(x1, y2 - 2 * r, x1 + 2 * r, y2, start=180, extent=90,
+                        style="pieslice", **kwargs)
+        self.create_arc(x2 - 2 * r, y2 - 2 * r, x2, y2, start=270, extent=90,
+                        style="pieslice", **kwargs)
+        self.create_rectangle(x1 + r, y1, x2 - r, y2, **kwargs)
+        self.create_rectangle(x1, y1 + r, x2, y2 - r, **kwargs)
+        if "outline" in kwargs:
+            self.create_line(x1 + r, y1, x2 - r, y1, fill=kwargs["outline"])
+            self.create_line(x1 + r, y2, x2 - r, y2, fill=kwargs["outline"])
+            self.create_line(x1, y1 + r, x1, y2 - r, fill=kwargs["outline"])
+            self.create_line(x2, y1 + r, x2, y2 - r, fill=kwargs["outline"])
+
+    def _hover(self, enter):
+        self._color = BTN_HOVER if enter else BTN_BG
+        self._draw()
+
+    def _click(self, event):
+        if self.command:
+            self.command()
+
+    def config(self, **kwargs):
+        if "text" in kwargs:
+            self.btn_text = kwargs["text"]
+            self._draw()
+
+
 class PomodoroTimer:
     def __init__(self):
         self.root = tk.Tk()
@@ -42,8 +101,6 @@ class PomodoroTimer:
 
         style = ttk.Style()
         style.theme_use("clam")
-        style.configure("TButton", font=("Segoe UI", 10), padding=(16, 8),
-                        borderwidth=4, relief="raised")
         style.configure("TProgressbar", thickness=8)
 
         self.remaining = WORK
@@ -105,10 +162,10 @@ class PomodoroTimer:
         # buttons
         row = tk.Frame(main, bg=BG)
         row.pack()
-        self.start_btn = ttk.Button(row, text="Start", command=self._toggle, width=8)
+        self.start_btn = RoundedButton(row, text="Start", command=self._toggle, width=90)
         self.start_btn.pack(side=tk.LEFT, padx=3)
-        ttk.Button(row, text="Reset", command=self._reset, width=8).pack(side=tk.LEFT, padx=3)
-        ttk.Button(row, text="Skip", command=self._skip, width=8).pack(side=tk.LEFT, padx=3)
+        RoundedButton(row, text="Reset", command=self._reset, width=90).pack(side=tk.LEFT, padx=3)
+        RoundedButton(row, text="Skip", command=self._skip, width=90).pack(side=tk.LEFT, padx=3)
 
         # count + on-top
         info = tk.Frame(main, bg=BG)
@@ -121,8 +178,8 @@ class PomodoroTimer:
         preset_frame = tk.Frame(main, bg=BG)
         preset_frame.pack(pady=(6, 0))
         for label, mins in [("25 min", 25), ("15 min", 15), ("5 min", 5)]:
-            ttk.Button(preset_frame, text=label, width=7,
-                       command=lambda m=mins: self._set_work(m)).pack(side=tk.LEFT, padx=2)
+            RoundedButton(preset_frame, text=label, width=80,
+                          command=lambda m=mins: self._set_work(m)).pack(side=tk.LEFT, padx=2)
 
         # settings gear
         bottom = tk.Frame(main, bg=BG)
